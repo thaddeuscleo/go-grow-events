@@ -1,15 +1,9 @@
 package http
 
 import (
-	"bytes"
-	"encoding/base64"
 	"go-grow-events/model"
 	"go-grow-events/usecase"
-	"image/png"
 	"net/http"
-	"strconv"
-
-	"github.com/skip2/go-qrcode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,19 +37,6 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 		return
 	}
 
-	encodedToQR := "user id: " + strconv.Itoa(participant.ID)
-	imagedQrCode, err := qrcode.New(encodedToQR, qrcode.Medium)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"responseCode": "50001",
-			"responseMessage": "QR Code does not work properly: " + err.Error(),
-		})
-		return
-	}
-
-	buffer := new(bytes.Buffer)
-	png.Encode(buffer, imagedQrCode.Image(256))
-	base64QRCode := base64.StdEncoding.EncodeToString(buffer.Bytes())
 
 	if participant.SessionID == 1 {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -69,7 +50,8 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 			"scanStatusID": participant.IsScanned,
 			"scanStatus": "Not Scanned",
 			"requestedSeat": participant.RequestedSeat,
-			"qrCode": base64QRCode,
+			"registrationCode": participant.RegistrationCode,
+			"qrCode": participant.QRCode,
 		})
 		return
 	}
@@ -86,6 +68,7 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 		"scanStatus": "Not Scanned",
 		"requestedSeat": participant.RequestedSeat,
 		"reasons": participant.Reasons,
-		"qrCode": base64QRCode,
+		"registrationCode": participant.RegistrationCode,
+		"qrCode": participant.QRCode,
 	})
 }

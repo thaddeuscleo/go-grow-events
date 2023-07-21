@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
 	"go-grow-events/model"
 	"go-grow-events/repository"
 	"go-grow-events/util"
@@ -51,7 +52,22 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	}
 
 	participant.PhoneNo = request.PhoneNo
-	participant.IsScanned = 1
+	// Bikin is scanned jadi 0 v
+	participant.IsScanned = 0
+
+
+	/*
+	Bikin kode qr codenya, isi qr codenya itu kode RI0930, simpen aja kode bookingnya di db
+	simpen kode qr code di db
+	cek booking by PHONE NUMBER - isi qr, ibadahnya jam brp, kode booking
+
+	wktu scan qr, is scanned bakal nambah 1 kali
+	lalu cek klo is scannednya = requested seat, klo udah gabisa scan lagi
+	
+	bikin admin
+	terus tambah di db yg udah ngescan brapa sama yg belum scan brapa
+	*/
+
 
 	if request.SessionID > 2 {
 		return &participant, errors.New("no sessions existed on that ID")
@@ -79,12 +95,24 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 
 		session.FilledCapacity += participant.RequestedSeat
 		session.EmptyCapacity -= participant.RequestedSeat
+		session.UnscannedSeat += participant.RequestedSeat
 		participant.Reasons = ""
 		participant.SessionID = 1
 
 		newParticipant, err := e.repo.CreateParticipantToDB(&participant)
 		if err != nil {
 			return newParticipant, err
+		}
+
+		participant.RegistrationCode = fmt.Sprintf("GCANNIV202301%06d", participant.ID)
+		participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
+		if err != nil {
+			return newParticipant, err
+		}
+
+		updatedParticipant, err := e.repo.UpdateParticipantToDB(&participant)
+		if err != nil {
+			return updatedParticipant, err
 		}
 
 		_, err = e.repo.UpdateSessionToDB(session)
@@ -108,6 +136,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	
 	session.FilledCapacity += participant.RequestedSeat
 	session.EmptyCapacity -= participant.RequestedSeat
+	session.UnscannedSeat += participant.RequestedSeat
 
 	participantInputtedReasons := request.Reasons
 	if participantInputtedReasons == "" {
@@ -120,6 +149,17 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	newParticipant, err := e.repo.CreateParticipantToDB(&participant)
 	if err != nil {
 		return newParticipant, err
+	}
+
+	participant.RegistrationCode = fmt.Sprintf("GCANNIV202302%06d", participant.ID)
+	participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
+	if err != nil {
+		return newParticipant, err
+	}
+
+	updatedParticipant, err := e.repo.UpdateParticipantToDB(&participant)
+	if err != nil {
+		return updatedParticipant, err
 	}
 
 	_, err = e.repo.UpdateSessionToDB(session)

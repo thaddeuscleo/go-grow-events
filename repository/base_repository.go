@@ -11,6 +11,7 @@ type BaseRepository interface {
     CreateParticipantToDB(participant *model.Participant) (*model.Participant, error)
     FindParticipantByEmail(email string) (*model.Participant, error)
     FindParticipantByPhoneNo(phoneNo string) (*model.Participant, error)
+    UpdateParticipantToDB(participant *model.Participant) (*model.Participant, error)
 	
 	UpdateSessionToDB(session *model.Session) (*model.Session, error)
 	FindSessionBySessionID(sessionID int) (*model.Session, error)
@@ -46,6 +47,15 @@ func (r *baseRepository) FindParticipantByEmail(email string) (*model.Participan
 func (r *baseRepository) FindParticipantByPhoneNo(phoneNo string) (*model.Participant, error) {
     var participant *model.Participant
     err := r.db.Where("email = ?", phoneNo).Find(&participant).Error
+    if err != nil {
+        return participant, err
+    }
+
+    return participant, nil
+}
+
+func (r *baseRepository) UpdateParticipantToDB(participant *model.Participant) (*model.Participant, error) {
+    err := r.db.Save(&participant).Error
     if err != nil {
         return participant, err
     }
