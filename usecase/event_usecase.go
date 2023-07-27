@@ -10,6 +10,7 @@ import (
 
 type EventUsecase interface {
 	PostRegisterSession(request *model.RegisterParticipantRequest) (*model.Participant, error)
+	PostVerifySession(request *model.VerifyParticipantRequest) (*model.Participant, error)
 }
 
 type eventUsecase struct {
@@ -103,8 +104,8 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		if err != nil {
 			return newParticipant, err
 		}
-
-		participant.RegistrationCode = fmt.Sprintf("GCANNIV202301%06d", participant.ID)
+		// GC0003
+		participant.RegistrationCode = fmt.Sprintf("GC%04d", participant.ID)
 		participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
 		if err != nil {
 			return newParticipant, err
@@ -151,7 +152,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		return newParticipant, err
 	}
 
-	participant.RegistrationCode = fmt.Sprintf("GCANNIV202302%06d", participant.ID)
+	participant.RegistrationCode = fmt.Sprintf("GC%04d", participant.ID)
 	participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
 	if err != nil {
 		return newParticipant, err
@@ -169,3 +170,38 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 
 	return newParticipant, nil
 }
+
+func (e *eventUsecase) PostVerifySession(request *model.VerifyParticipantRequest) (*model.Participant, error) {
+	registrationCode := request.RegistrationCode
+	
+	existingParticipant, err := e.repo.FindParticipantByCode(registrationCode)
+	if err != nil {
+		return nil, errors.New("registration code is not found")
+	}
+
+	if existingParticipant.IsScanned == existingParticipant.RequestedSeat {
+		return existingParticipant, errors.New("already scan all the requested seats")
+	}
+	existingParticipant.IsScanned += 1
+
+	currentSession, err := e.repo.FindSessionBySessionID(existingParticipant.SessionID)
+	if err != nil {
+		return existingParticipant, errors.New("session is not found")
+	}
+
+	currentSession.ScannedSeat += 1
+	currentSession.UnscannedSeat -= 1
+
+	updatedParticipant, err := e.repo.UpdateParticipantToDB(existingParticipant)
+	if err != nil {
+		return existingParticipant, err
+	}
+
+	_, err = e.repo.UpdateSessionToDB(currentSession)
+	if err != nil {
+		return existingParticipant, err
+	}
+
+	return updatedParticipant, nil
+}
+

@@ -47,7 +47,6 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 			"phoneNo": participant.PhoneNo,
 			"sessionID": participant.SessionID,
 			"sessionName": "GROW Center Anniversary 1st Service",
-			"scanStatusID": participant.IsScanned,
 			"scanStatus": "Not Scanned",
 			"requestedSeat": participant.RequestedSeat,
 			"registrationCode": participant.RegistrationCode,
@@ -64,10 +63,62 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 		"phoneNo": participant.PhoneNo,
 		"sessionID": participant.SessionID,
 		"sessionName": "GROW Center Anniversary 2nd Service",
-		"scanStatusID": participant.IsScanned,
 		"scanStatus": "Not Scanned",
 		"requestedSeat": participant.RequestedSeat,
 		"reasons": participant.Reasons,
+		"registrationCode": participant.RegistrationCode,
+		"qrCode": participant.QRCode,
+	})
+}
+
+func (h *EventHandler) VerifyParticipant(ctx *gin.Context) {
+	var participantRequest model.VerifyParticipantRequest
+
+	err := ctx.ShouldBindJSON(&participantRequest)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
+			"responseCode": "42202",
+			"responseMessage": "The required field on the body request is empty or invalid.",
+		})
+		return
+	}
+
+	participant, err := h.eventUsecase.PostVerifySession(&participantRequest)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseCode": "40002",
+			"responseMessage": "Usecase PostRegisterUser is not working properly: " + err.Error(),
+		})
+		return
+	}
+
+	if participant.SessionID == 1 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"responseCode": "20000",
+			"responseMessage": "Participant has been verified to enter the service",
+			"name": participant.Name,
+			"email": participant.Email,
+			"phoneNo": participant.PhoneNo,
+			"sessionID": participant.SessionID,
+			"sessionName": "GROW Center Anniversary 1st Service",
+			"totalScanned": participant.IsScanned,
+			"requestedSeat": participant.RequestedSeat,
+			"registrationCode": participant.RegistrationCode,
+			"qrCode": participant.QRCode,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseCode": "20000",
+		"responseMessage": "Participant has been registered successfully",
+		"name": participant.Name,
+		"email": participant.Email,
+		"phoneNo": participant.PhoneNo,
+		"sessionID": participant.SessionID,
+		"sessionName": "GROW Center Anniversary 2nd Service",
+		"totalScanned": participant.IsScanned,
+		"requestedSeat": participant.RequestedSeat,
 		"registrationCode": participant.RegistrationCode,
 		"qrCode": participant.QRCode,
 	})

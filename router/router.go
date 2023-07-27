@@ -30,6 +30,7 @@ func InitRouter(event *handler.EventHandler) {
 	api := r.Group("v1.0/api")
 
 	api.POST("/user/register", event.RegisterParticipant)
+	api.POST("/user/verify", event.VerifyParticipant)
 	
 	/*apiAuth := r.Group("v1/api")
 	apiAuth.Use(middleware.AuthMiddleWare())*/

@@ -30,3 +30,10 @@ type RegisterParticipantRequest struct {
 	SessionID			int				`json:"sessionID" binding:"required"`
 }
 
+type VerifyParticipantRequest struct {
+	RegistrationCode	string			`json:"registrationCode" binding:"required"`
+}
+
+type PhoneNumberRequest struct {
+	PhoneNumber			string			`json:"phoneNumber" binding:"required"`
+}

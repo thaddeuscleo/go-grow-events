@@ -6,6 +6,7 @@ import (
 	"image/png"
 
 	"github.com/skip2/go-qrcode"
+	//"github.com/liyue201/goqr"
 )
 
 func GenerateQRCode(bookingCode string) (string, error) {
@@ -20,3 +21,4 @@ func GenerateQRCode(bookingCode string) (string, error) {
 
 	return base64QRCode, nil
 }
+
