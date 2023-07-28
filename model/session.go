@@ -23,3 +23,7 @@ type CreateSessionRequest struct {
 	Time				string			`json:"sessionTime"`
 	EmptyCapacity		int				`json:"sessionCapacity"`
 }
+
+type SessionInfoRequest struct {
+	ID					int				`uri:"id" binding:"required"`
+}

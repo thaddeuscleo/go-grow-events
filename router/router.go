@@ -31,6 +31,8 @@ func InitRouter(event *handler.EventHandler) {
 
 	api.POST("/user/register", event.RegisterParticipant)
 	api.POST("/user/verify", event.VerifyParticipant)
+	api.POST("/user/view", event.ViewBooking)
+	api.GET("/session/:id", event.SessionInfo)
 	
 	/*apiAuth := r.Group("v1/api")
 	apiAuth.Use(middleware.AuthMiddleWare())*/

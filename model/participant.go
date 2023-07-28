@@ -37,3 +37,13 @@ type VerifyParticipantRequest struct {
 type PhoneNumberRequest struct {
 	PhoneNumber			string			`json:"phoneNumber" binding:"required"`
 }
+
+type ViewBookingRequest struct {
+	Booking 			string			`json:"booking" binding:"required"`
+}
+
+type Booking struct {
+	Email				string			`json:"email"`
+	PhoneNo				string			`json:"phoneNo"`
+	RegistrationCode	string			`json:"registrationCode"`
+}

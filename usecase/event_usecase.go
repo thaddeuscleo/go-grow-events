@@ -11,6 +11,9 @@ import (
 type EventUsecase interface {
 	PostRegisterSession(request *model.RegisterParticipantRequest) (*model.Participant, error)
 	PostVerifySession(request *model.VerifyParticipantRequest) (*model.Participant, error)
+	PostViewBooking(request *model.ViewBookingRequest) (*model.Participant, error)
+
+	GetSessionInfo(request model.SessionInfoRequest) (*model.Session, error)
 }
 
 type eventUsecase struct {
@@ -53,22 +56,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	}
 
 	participant.PhoneNo = request.PhoneNo
-	// Bikin is scanned jadi 0 v
 	participant.IsScanned = 0
-
-
-	/*
-	Bikin kode qr codenya, isi qr codenya itu kode RI0930, simpen aja kode bookingnya di db
-	simpen kode qr code di db
-	cek booking by PHONE NUMBER - isi qr, ibadahnya jam brp, kode booking
-
-	wktu scan qr, is scanned bakal nambah 1 kali
-	lalu cek klo is scannednya = requested seat, klo udah gabisa scan lagi
-	
-	bikin admin
-	terus tambah di db yg udah ngescan brapa sama yg belum scan brapa
-	*/
-
 
 	if request.SessionID > 2 {
 		return &participant, errors.New("no sessions existed on that ID")
@@ -205,3 +193,26 @@ func (e *eventUsecase) PostVerifySession(request *model.VerifyParticipantRequest
 	return updatedParticipant, nil
 }
 
+func (e *eventUsecase) PostViewBooking(request *model.ViewBookingRequest) (*model.Participant, error) {
+	booking := request.Booking
+
+	participant, err := e.repo.FindParticipantByMultipleFilter(booking)
+	if err != nil {
+		return participant, err
+	}
+
+	return participant, nil
+}
+
+func (e *eventUsecase) GetSessionInfo(request model.SessionInfoRequest) (*model.Session, error) {
+	session, err := e.repo.FindSessionBySessionID(request.ID)
+	if err != nil {
+		return session, err
+	}
+
+	if session.ID == 0 {
+		return session, errors.New("session does not exist")
+	}
+
+	return session, nil
+}
