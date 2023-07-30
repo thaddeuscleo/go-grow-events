@@ -72,8 +72,8 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 			return &participant, err
 		}
 
-		if request.RequestedSeat > 6 {
-			return &participant, errors.New("maximum number of seat is 6")
+		if request.RequestedSeat > 4 {
+			return &participant, errors.New("maximum number of seat is 4")
 		}
 		
 		participant.RequestedSeat = request.RequestedSeat
@@ -92,7 +92,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		if err != nil {
 			return newParticipant, err
 		}
-		// GC0003
+		
 		participant.RegistrationCode = fmt.Sprintf("GC%04d", participant.ID)
 		participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
 		if err != nil {
