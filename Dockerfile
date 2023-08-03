@@ -17,4 +17,4 @@ COPY --from=Build /opt/go-grow/env.env /opt/go-grow/env.env
 
 EXPOSE 8080
 
-# ENTRYPOINT ["/opt/go-grow/app"]
+ENTRYPOINT ["/opt/go-grow/app"]
