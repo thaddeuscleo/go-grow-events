@@ -19,7 +19,6 @@ ENV DB_CHARSET none
 
 WORKDIR /opt/go-grow
 COPY --from=Build /opt/go-grow/app /opt/go-grow/app
-COPY --from=Build /opt/go-grow/env.env /opt/go-grow/env.env
 
 EXPOSE 8080
 
