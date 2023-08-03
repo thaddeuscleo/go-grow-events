@@ -27,6 +27,9 @@ func InitRouter(event *handler.EventHandler) {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	// Health Check
+	r.GET("/", event.Health)
+
 	api := r.Group("v1.0/api")
 
 	api.POST("/user/register", event.RegisterParticipant)
