@@ -16,13 +16,13 @@ func InitRouter(event *handler.EventHandler) {
 	r.Static("/images", "./mock/images")
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost:3000"
+			return origin == "*"
 		},
 		MaxAge: 12 * time.Hour,
 	}))
@@ -33,10 +33,10 @@ func InitRouter(event *handler.EventHandler) {
 	api.POST("/user/verify", event.VerifyParticipant)
 	api.POST("/user/view", event.ViewBooking)
 	api.GET("/session/:id", event.SessionInfo)
-	
+
 	/*apiAuth := r.Group("v1/api")
 	apiAuth.Use(middleware.AuthMiddleWare())*/
-	
+
 }
 
 func Start() error {
