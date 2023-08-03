@@ -19,11 +19,11 @@ services:
     image: grow-reg:0.0.1
     command: tail -f /dev/null
     environment:
-      - DB_USER=0hn96gileawlwr8zr0jx
-      - DB_PASSWORD=pscale_pw_OEcV6RVECQggckOyELlCJyoxaofFPXLrnwORmnE5Bro
-      - DB_HOST=aws.connect.psdb.cloud
-      - DB_NAME=grow-reg
-      - DB_CHARSET=utf8mb4
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_HOST=$DB_HOST
+      - DB_NAME=$DB_NAME
+      - DB_CHARSET=$DB_CHARSET
     ports:
       - 8080:8080
     networks:
