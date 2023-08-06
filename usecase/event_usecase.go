@@ -46,7 +46,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	participant.Email = participantInputtedEmail
 
 	participantInputtedPhoneNo := request.PhoneNo
-	checkPhoneNoAvailable, err := e.repo.FindParticipantByEmail(participantInputtedPhoneNo)
+	checkPhoneNoAvailable, err := e.repo.FindParticipantByPhoneNo(participantInputtedPhoneNo) // new changes to check phone number
 	if err != nil {
 		return &participant, err
 	}
@@ -55,7 +55,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		return &participant, errors.New("user with this phone number is already exist")
 	}
 
-	participant.PhoneNo = request.PhoneNo
+	participant.PhoneNo = participantInputtedPhoneNo // new changes to check phone number
 	participant.IsScanned = 0
 
 	if request.SessionID > 2 {
