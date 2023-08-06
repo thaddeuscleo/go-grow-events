@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  # mysql:
+  #   image: mysql:8
+  #   ports:
+  #     - 3306:3306
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=root
+  #     - MYSQL_PASSWORD=root
+  #     - MYSQL_USER=user
+  #     - MYSQL_DATABASE=test
+  #   networks:
+  #     - app
+
+  grow-reg:
+    image: grow-reg:0.0.1
+    command: tail -f /dev/null
+    environment:
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_HOST=$DB_HOST
+      - DB_NAME=$DB_NAME
+      - DB_CHARSET=$DB_CHARSET
+    ports:
+      - 8080:8080
+    networks:
+      - app
+    # depends_on:
+    #   - mysql
+    
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  mysql_data:
