@@ -152,7 +152,7 @@ func (h *EventHandler) ViewBooking(ctx *gin.Context) {
 			"phoneNo":          participant.PhoneNo,
 			"sessionID":        participant.SessionID,
 			"sessionName":      "GROW Center Anniversary 1st Service",
-			"scanStatus":       fmt.Sprintf("%d out of %d", participant.IsScanned, participant.RequestedSeat),
+			"scanStatus":       fmt.Sprintf("%d/%d", participant.IsScanned, participant.RequestedSeat),
 			"requestedSeat":    participant.RequestedSeat,
 			"registrationCode": participant.RegistrationCode,
 			"qrCode":           participant.QRCode,
