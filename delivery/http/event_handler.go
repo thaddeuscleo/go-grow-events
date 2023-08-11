@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"go-grow-events/model"
 	"go-grow-events/usecase"
 	"net/http"
@@ -151,7 +152,7 @@ func (h *EventHandler) ViewBooking(ctx *gin.Context) {
 			"phoneNo":          participant.PhoneNo,
 			"sessionID":        participant.SessionID,
 			"sessionName":      "GROW Center Anniversary 1st Service",
-			"scanStatus":       "Not Scanned",
+			"scanStatus":       fmt.Sprintf("%d out of %d", participant.IsScanned, participant.RequestedSeat),
 			"requestedSeat":    participant.RequestedSeat,
 			"registrationCode": participant.RegistrationCode,
 			"qrCode":           participant.QRCode,
