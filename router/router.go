@@ -32,7 +32,7 @@ func InitRouter(event *handler.EventHandler) {
 
 	api := r.Group("v1.0/api")
 
-	api.POST("/user/register", event.RegisterParticipant)
+	//api.POST("/user/register", event.RegisterParticipant)
 	api.POST("/user/verify", event.VerifyParticipant)
 	api.POST("/user/view", event.ViewBooking)
 	api.GET("/session/:id", event.SessionInfo)
