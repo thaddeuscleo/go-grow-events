@@ -38,7 +38,7 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 		return
 	}
 
-	if participant.SessionID == 1 {
+	/*if participant.SessionID == 1 {
 		ctx.JSON(http.StatusOK, gin.H{
 			"responseCode":     "20000",
 			"responseMessage":  "Participant has been registered successfully",
@@ -53,7 +53,7 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 			"qrCode":           participant.QRCode,
 		})
 		return
-	}
+	}*/
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"responseCode":     "20000",
@@ -62,7 +62,7 @@ func (h *EventHandler) RegisterParticipant(ctx *gin.Context) {
 		"email":            participant.Email,
 		"phoneNo":          participant.PhoneNo,
 		"sessionID":        participant.SessionID,
-		"sessionName":      "GROW Center Anniversary 2nd Service",
+		"sessionName":      "Christmas Service",
 		"scanStatus":       "Not Scanned",
 		"requestedSeat":    participant.RequestedSeat,
 		"reasons":          participant.Reasons,
