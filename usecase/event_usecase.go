@@ -6,6 +6,7 @@ import (
 	"go-grow-events/model"
 	"go-grow-events/repository"
 	"go-grow-events/util"
+	"strings"
 )
 
 type EventUsecase interface {
@@ -28,10 +29,10 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 	participant := model.Participant{}
 	participant.Name = request.Name
 	
-	participantInputtedEmail := request.Email
+	participantInputtedEmail := strings.ToLower(request.Email)
 	checkEmailString, err := util.EmailStringRegex(participantInputtedEmail)
 	if !checkEmailString {
-		return &participant, err
+		return nil, err
 	}
 
 	checkEmailAvailable, err := e.repo.FindParticipantByEmail(participantInputtedEmail)
@@ -66,7 +67,7 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		return &participant, errors.New("no sessions existed on that ID")
 	}
 
-	if request.SessionID == 1 {
+	/*if request.SessionID == 1 {
 		session, err := e.repo.FindSessionBySessionID(request.SessionID)
 		if err != nil {
 			return &participant, err
@@ -156,7 +157,50 @@ func (e *eventUsecase) PostRegisterSession(request *model.RegisterParticipantReq
 		return &participant, err
 	}
 
-	return newParticipant, nil
+	return newParticipant, nil*/
+	session, err := e.repo.FindSessionBySessionID(request.SessionID)
+	if err != nil {
+		return &participant, err
+	}
+
+	if request.RequestedSeat > 4 {
+		return &participant, errors.New("maximum number of seat is 4")
+	}
+		
+	participant.RequestedSeat = request.RequestedSeat
+		
+	if session.EmptyCapacity == 0 {
+		return &participant, errors.New("there is no empty seat available anymore")
+	}
+
+	session.FilledCapacity += participant.RequestedSeat
+	session.EmptyCapacity -= participant.RequestedSeat
+	session.UnscannedSeat += participant.RequestedSeat
+	participant.Reasons = ""
+	participant.SessionID = request.SessionID
+
+	newParticipant, err := e.repo.CreateParticipantToDB(&participant)
+	if err != nil {
+		return newParticipant, err
+	}
+		
+	participant.RegistrationCode = fmt.Sprintf("GC%04d", participant.ID)
+	participant.QRCode, err = util.GenerateQRCode(participant.RegistrationCode)
+	if err != nil {
+		return newParticipant, err
+	}
+
+	updatedParticipant, err := e.repo.UpdateParticipantToDB(&participant)
+	if err != nil {
+		return updatedParticipant, err
+	}
+
+	_, err = e.repo.UpdateSessionToDB(session)
+	if err != nil {
+		return &participant, err
+	}
+
+	return updatedParticipant, nil
 }
 
 func (e *eventUsecase) PostVerifySession(request *model.VerifyParticipantRequest) (*model.Participant, error) {
